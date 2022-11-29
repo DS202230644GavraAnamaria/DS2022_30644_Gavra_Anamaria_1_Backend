@@ -6,14 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ro.tuc.ds2020.controllers.handlers.exceptions.model.ResourceNotFoundException;
 import ro.tuc.ds2020.dtos.builders.ConsumptionBuilder;
-import ro.tuc.ds2020.dtos.builders.DeviceBuilder;
 import ro.tuc.ds2020.dtos.detailsDTO.ConsumptionDetailsDTO;
-import ro.tuc.ds2020.dtos.detailsDTO.DeviceDetailsDTO;
 import ro.tuc.ds2020.dtos.dto.ConsumptionDTO;
 import ro.tuc.ds2020.entities.Consumption;
 import ro.tuc.ds2020.entities.Device;
 import ro.tuc.ds2020.repositories.ConsumptionRepository;
 import ro.tuc.ds2020.repositories.DeviceRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,12 +32,6 @@ public class ConsumptionService {
         this.deviceRepository = deviceRepository;
     }
 
-    public List<ConsumptionDTO> findConsumptions() {
-        List<Consumption> ConsumptionList = consumptionRepository.findAll();
-        return ConsumptionList.stream()
-                .map(ConsumptionBuilder::toConsumptionDTO)
-                .collect(Collectors.toList());
-    }
 
     public ConsumptionDetailsDTO findConsumptionById(UUID id) {
         Optional<Consumption> prosumerOptional = consumptionRepository.findById(id);
@@ -47,20 +42,18 @@ public class ConsumptionService {
         return ConsumptionBuilder.toConsumptionDetailsDTO(prosumerOptional.get());
     }
 
-    public DeviceDetailsDTO findDeviceById(UUID id) {
-        Optional<Device> prosumerOptional = deviceRepository.findById(id);
-        if (!prosumerOptional.isPresent()) {
-            LOGGER.error("Consumption with id {} was not found in db", id);
-            throw new ResourceNotFoundException(Consumption.class.getSimpleName() + " with id: " + id);
-        }
-        return DeviceBuilder.toDeviceDetailsDTO(prosumerOptional.get());
+    public List<ConsumptionDTO> getConsByDay(String deviceDescription, LocalDate date) {
+        Device device=deviceRepository.findByDescription(deviceDescription).orElse(null);
+        List<Consumption> cons = consumptionRepository.findByDeviceAndTimeBetween(device, LocalDateTime.of(date, LocalTime.of(0, 0, 0)), LocalDateTime.of(date, LocalTime.of(23, 59, 59)));
+        return  cons.stream()
+                .map(ConsumptionBuilder::toConsumptionDTO)
+                .collect(Collectors.toList());
     }
 
-    public UUID insert(ConsumptionDetailsDTO ConsumptionDTO) {
-        Device u = deviceRepository.findById(ConsumptionDTO.getDevice_id()).get();
-        Consumption Consumption = ConsumptionBuilder.toEntity(ConsumptionDTO, u);
-        Consumption = consumptionRepository.save(Consumption);
-        LOGGER.debug("Consumption with id {} was inserted in db", Consumption.getId());
-        return Consumption.getId();
+    public void insertCons() {
+        Device device =deviceRepository.findByDescription("device2").orElse(null);
+        LocalDateTime d = LocalDateTime.of(LocalDate.of(2022, 11, 19), LocalTime.of(0, 0, 0));
+        for(int j=0;j<24;j++)
+            consumptionRepository.save(new Consumption(d.plusHours(23), (float)Math.random() * 30,device));
     }
 }

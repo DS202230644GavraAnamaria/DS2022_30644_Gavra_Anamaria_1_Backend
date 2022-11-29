@@ -7,9 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.tuc.ds2020.dtos.detailsDTO.ConsumptionDetailsDTO;
 import ro.tuc.ds2020.dtos.dto.ConsumptionDTO;
+import ro.tuc.ds2020.dtos.dto.DeviceDTO;
 import ro.tuc.ds2020.services.ConsumptionService;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -26,29 +30,19 @@ public class ConsumptionController {
         this.consumptionService = cService;
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ConsumptionDTO>> getConsumptions() {
-        List<ConsumptionDTO> dtos = consumptionService.findConsumptions();
-        for (ConsumptionDTO dto : dtos) {
-            Link personLink = linkTo(methodOn(ConsumptionController.class)
-                    .getConsumption(dto.getId())).withRel("personDetails");
-            dto.add(personLink);
-        }
-        return new ResponseEntity<>(dtos, HttpStatus.OK);
-    }
-
     @PostMapping()
-    public ResponseEntity<UUID> insertProsumer(@Valid @RequestBody ConsumptionDetailsDTO personDTO) {
-        UUID personID = consumptionService.insert(personDTO);
-        return new ResponseEntity<>(personID, HttpStatus.CREATED);
+    public ResponseEntity<List<ConsumptionDTO>> getConsByDay(@RequestBody String day) {
+        System.out.println(day+"1234\n\n\n\n");
+        System.out.println(day.substring(1,5)+"\n"+day.substring(5,7)+"\n"+day.substring(7,9)+"\n"+day.substring(9,day.length()-1)+"\n");
+        LocalDate d = LocalDate.of(Integer.parseInt(day.substring(1,5)), Integer.parseInt(day.substring(5,7)), Integer.parseInt(day.substring(7,9)));
+        List<ConsumptionDTO> cons =consumptionService.getConsByDay(day.substring(9,day.length()-1), d);
+        return new ResponseEntity<>(cons, HttpStatus.OK);
+    }
+    @PutMapping()
+    public void insertCons() {
+        consumptionService.insertCons();
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<ConsumptionDetailsDTO> getConsumption(@PathVariable("id") UUID personId) {
-        ConsumptionDetailsDTO dto = consumptionService.findConsumptionById(personId);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
-    }
 
-    //TODO: UPDATE, DELETE per resource
 
 }

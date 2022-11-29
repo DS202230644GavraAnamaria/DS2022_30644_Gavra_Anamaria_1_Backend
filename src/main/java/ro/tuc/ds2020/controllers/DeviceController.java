@@ -38,7 +38,12 @@ public class DeviceController {
         }
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
-
+    @PostMapping(path="/client")
+    public ResponseEntity<List<DeviceDTO>> getDeviceByUser(@RequestBody String name) {
+        System.out.println(name.substring(1, name.length()-1)+"1234\n\n\n\n");
+        List<DeviceDTO> device = deviceService.getUserDevices(name.substring(1, name.length()-1));
+        return new ResponseEntity<>(device, HttpStatus.OK);
+    }
     @GetMapping(path = "/mapping")
     public ResponseEntity<List<MappingDTO>> getMapping() {
         List<MappingDTO> dtos = deviceService.findMappingDU();
@@ -51,6 +56,7 @@ public class DeviceController {
         List<DeviceDTO> device = deviceService.getUserDevices(user);
         return new ResponseEntity<>(device, HttpStatus.OK);
     }
+
 
     @PostMapping()
     public ResponseEntity<UUID> insertProsumer(@Valid @RequestBody DeviceDetailsDTO deviceDetailsDTO) {

@@ -24,6 +24,7 @@ public interface DeviceRepository extends JpaRepository<Device, UUID> {
     @Transactional
     Optional<List<Device>> findByUser(User user);
 
+
     @Modifying
     @Transactional
     @Query(value="UPDATE Device d SET d.user = :u WHERE d.description = :description")

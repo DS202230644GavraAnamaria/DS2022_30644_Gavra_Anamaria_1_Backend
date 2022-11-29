@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
 @Service
 public class DeviceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
@@ -96,15 +97,15 @@ public class DeviceService {
     }
 
     public List<DeviceDTO> getUserDevices(String user) {
-        System.out.println("\n\n\n\n\n\n\n\n!!!!!!!!!!!!!!!!!???????????!!!!!!!!!\n\n"+user);
         User user1 = userRepository.findByName(user).orElseThrow(() ->  new  ResourceNotFoundException(User.class.getSimpleName() + " with id: "+user));
+        System.out.println(user1.getName()+user1.getId());
         List<Device> devices = deviceRepository.findByUser(user1).orElse(null);
+        System.out.println(devices);
         if(devices==null)
             return null;
         else
             return devices.stream()
                     .map(DeviceBuilder::toDeviceDTO)
                     .collect(Collectors.toList());
-
     }
 }
