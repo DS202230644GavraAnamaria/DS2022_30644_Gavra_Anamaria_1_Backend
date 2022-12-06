@@ -18,14 +18,13 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ConsumptionDetailsDTO {
-
     private UUID id;
     @NotNull
-    private LocalDateTime time;
-    @NotNull
+    private String time;
+
     private Float value;
     @NotNull
-    private UUID device_id;
+    private String device;
 
     @Override
     public boolean equals(Object o) {
@@ -33,11 +32,11 @@ public class ConsumptionDetailsDTO {
         if (o == null || getClass() != o.getClass()) return false;
         ConsumptionDetailsDTO cDTO = (ConsumptionDetailsDTO) o;
         return  Objects.equals(time, cDTO.time) &&
-                Objects.equals(device_id, cDTO.device_id);
+                Objects.equals(device, cDTO.device);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(time, device_id);
+        return Objects.hash(time, device);
     }
 }

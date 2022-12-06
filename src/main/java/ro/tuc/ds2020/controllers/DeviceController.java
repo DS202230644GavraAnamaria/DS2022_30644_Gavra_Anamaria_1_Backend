@@ -59,7 +59,7 @@ public class DeviceController {
 
 
     @PostMapping()
-    public ResponseEntity<UUID> insertProsumer(@Valid @RequestBody DeviceDetailsDTO deviceDetailsDTO) {
+    public ResponseEntity<UUID> insertDevice(@Valid @RequestBody DeviceDetailsDTO deviceDetailsDTO) {
         UUID deviceID = deviceService.insert(deviceDetailsDTO);
         return new ResponseEntity<>(deviceID, HttpStatus.CREATED);
     }
@@ -71,6 +71,7 @@ public class DeviceController {
 
     @PutMapping
     public ResponseEntity<UUID> updateDevice(@RequestBody DeviceDetailsDTO deviceDetailsDTO) {
+        System.out.println(deviceDetailsDTO);
         UUID deviceID = deviceService.update(deviceDetailsDTO);
         return new ResponseEntity<>(deviceID, HttpStatus.CREATED);
     }
@@ -79,5 +80,12 @@ public class DeviceController {
     public ResponseEntity<DeviceDetailsDTO> getDevice(@PathVariable("id") UUID personId) {
         DeviceDetailsDTO dto = deviceService.findDeviceById(personId);
         return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<String> deleteDeviceByDescription(@Valid @RequestBody String description) {
+        System.out.println(description);
+        deviceService.deleteByDescription(description);
+        return new ResponseEntity<>(description, HttpStatus.OK);
     }
 }

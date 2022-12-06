@@ -15,6 +15,7 @@ import ro.tuc.ds2020.enums.Role;
 import ro.tuc.ds2020.repositories.DeviceRepository;
 import ro.tuc.ds2020.repositories.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,10 +58,11 @@ public class UserService {
     }
     public void deleteByName(String name) {
         User user=userRepository.findByName(name.substring(1, name.length()-1)).orElseThrow(()->new ResourceNotFoundException("kdsmk"));
-        for(Device d: deviceRepository.findByUser(user).orElseThrow(RuntimeException::new))
-            deviceRepository.updateUser(null,d.getDescription());
+            for(Device d: deviceRepository.findByUser(user).orElse(new ArrayList<>()))
+                deviceRepository.updateUser(null,d.getDescription());
         userRepository.delete(user);
     }
+
 
     public UUID update(UserDetailsDTO personDTO) {
         User u = userRepository.findByName(personDTO.getUser()).orElseThrow(() ->  new  ResourceNotFoundException(User.class.getSimpleName() + " with id: " + personDTO.getUser()));

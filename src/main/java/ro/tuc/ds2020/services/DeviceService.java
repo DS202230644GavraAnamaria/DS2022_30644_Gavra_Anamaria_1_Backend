@@ -12,6 +12,7 @@ import ro.tuc.ds2020.dtos.dto.DeviceDTO;
 import ro.tuc.ds2020.dtos.dto.MappingDTO;
 import ro.tuc.ds2020.entities.Device;
 import ro.tuc.ds2020.entities.User;
+import ro.tuc.ds2020.repositories.ConsumptionRepository;
 import ro.tuc.ds2020.repositories.DeviceRepository;
 import ro.tuc.ds2020.repositories.UserRepository;
 import java.util.ArrayList;
@@ -20,17 +21,18 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Service
 public class DeviceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
+    private final ConsumptionRepository consumptionRepository;
 
     @Autowired
-    public DeviceService(DeviceRepository deviceRepository, UserRepository userRepository) {
+    public DeviceService(DeviceRepository deviceRepository, UserRepository userRepository, ConsumptionRepository consRepository) {
         this.deviceRepository = deviceRepository;
         this.userRepository = userRepository;
+        this.consumptionRepository=consRepository;
     }
 
     public List<DeviceDTO> findDevices() {
@@ -107,5 +109,11 @@ public class DeviceService {
             return devices.stream()
                     .map(DeviceBuilder::toDeviceDTO)
                     .collect(Collectors.toList());
+    }
+
+    public void deleteByDescription(String description) {
+        Device d=deviceRepository.findByDescription(description.substring(1, description.length()-1)).orElseThrow(()->new ResourceNotFoundException("kdsmk"));
+        consumptionRepository.deleteAll(consumptionRepository.findByDevice(d));
+        deviceRepository.delete(d);
     }
 }

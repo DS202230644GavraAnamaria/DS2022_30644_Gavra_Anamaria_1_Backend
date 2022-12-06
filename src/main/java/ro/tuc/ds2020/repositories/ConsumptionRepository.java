@@ -25,6 +25,10 @@ public interface ConsumptionRepository extends JpaRepository<Consumption, UUID> 
     List<User> findByValue(float value);
     List<Consumption> findByDeviceAndTimeBetween(Device device, LocalDateTime time, LocalDateTime time2);
 
+   List<Consumption> findByDevice(Device device);
+
+    void deleteByDevice(Device device);
+
     /**
      * Example: Write Custom Query
      */
